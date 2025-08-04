@@ -6,5 +6,4 @@ package-lock.json
 __pycache__/
 
 # Build files
-dist/
 *.pyc
