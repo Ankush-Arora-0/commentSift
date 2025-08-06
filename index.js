@@ -50,6 +50,7 @@ app.post('/addcomment',async(req,res)=>{
           })
         }
         else{
+          res.send({ message: "Comment not added" });
           console.log("not matching");
         }
     }
