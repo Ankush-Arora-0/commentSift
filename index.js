@@ -3,7 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import axios from 'axios';
+import { checkRelevance } from './relevance_api.js';
 const app = express();
 const relevantTo = "Binary search";
 app.use(express.json())
@@ -30,13 +30,6 @@ const cleanup = () => {
   process.on('SIGTERM', cleanup);    // `kill` command
   process.on('exit', cleanup); 
 
-  const checkRelevance = async (comment, topic) => {
-    const res = await axios.post('http://localhost:8000/check', {
-      comment,
-      topic
-    });
-    return res.data.similarity;
-  };
 
 app.post('/addcomment',async(req,res)=>{
     try{
