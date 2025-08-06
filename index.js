@@ -4,13 +4,19 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkRelevance } from './relevance_api.js';
+import { Server } from 'socket.io';
+import http from 'http'
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["https://commentsift.onrender.com"], // frontend URL
+    methods: ["GET", "POST"]
+  }
+});
 const relevantTo = "Binary search";
 app.use(express.json())
-app.use(cors({
-    origin:["http://localhost:5173","*"],
-    credentials:true
-}));
+app.use(cors({ origin: ["https://commentsift.onrender.com"], credentials: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename)
 const FILE_PATH = path.join(__dirname,'comment.txt');
@@ -39,8 +45,8 @@ app.post('/addcomment',async(req,res)=>{
         if(similarity>0.6){
           fs.appendFile('comment.txt',comment+'\n',(err)=>{
             if(err) throw err;
-            res.send("Data appended");
-            console.log("Data appended");
+            io.emit('new-comment');  // 🔔 Notify all clients
+            res.send({ message: "Comment added" });
           })
         }
         else{
@@ -73,6 +79,6 @@ app.get('/getcomments', async (req, res) => {
   }
 });
 
-app.listen(5000,()=>{
+server.listen(5000, () => {
   console.log('Our server is listening at port 5000');
-})
+});
